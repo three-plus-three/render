@@ -49,7 +49,7 @@ type Delims struct {
 // Options is a struct for specifying configuration options for the render.Render object.
 type Options struct {
 	// Directory to load templates. Default is "templates".
-	Directory string
+	Directories []string
 	// FileSystem to access files
 	FileSystem FileSystem
 	// Asset function to use in place of directory. Defaults to nil.
@@ -191,20 +191,9 @@ func (r *Render) compileTemplatesFromDir() {
 	r.templates = template.New(strings.Join(dirs, string(filepath.ListSeparator)))
 	r.templates.Delims(r.opt.Delims.Left, r.opt.Delims.Right)
 
-<<<<<<< HEAD
-	// Walk the supplied directory and compile any files that match our extension list.
-	r.opt.FileSystem.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		// Fix same-extension-dirs bug: some dir might be named to: "users.tmpl", "local.html".
-		// These dirs should be excluded as they are not valid golang templates, but files under
-		// them should be treat as normal.
-		// If is a dir, return immediately (dir is not a valid golang template).
-		if info == nil || info.IsDir() {
-			return nil
-		}
-=======
 	for _, dir := range dirs {
 		// Walk the supplied directory and compile any files that match our extension list.
-		filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		r.opt.FileSystem.Walk(dir, func(path string, info os.FileInfo, err error) error {
 			// Fix same-extension-dirs bug: some dir might be named to: "users.tmpl", "local.html".
 			// These dirs should be excluded as they are not valid golang templates, but files under
 			// them should be treat as normal.
@@ -212,7 +201,6 @@ func (r *Render) compileTemplatesFromDir() {
 			if info == nil || info.IsDir() {
 				return nil
 			}
->>>>>>> change Directory to Directies
 
 			rel, err := filepath.Rel(dir, path)
 			if err != nil {
@@ -224,16 +212,9 @@ func (r *Render) compileTemplatesFromDir() {
 				ext = filepath.Ext(rel)
 			}
 
-<<<<<<< HEAD
-		for _, extension := range r.opt.Extensions {
-			if ext == extension {
-				buf, err := r.opt.FileSystem.ReadFile(path)
-				if err != nil {
-					panic(err)
-=======
 			for _, extension := range r.opt.Extensions {
 				if ext == extension {
-					buf, err := ioutil.ReadFile(path)
+					buf, err := r.opt.FileSystem.ReadFile(path)
 					if err != nil {
 						panic(err)
 					}
@@ -252,7 +233,6 @@ func (r *Render) compileTemplatesFromDir() {
 					// Break out if this parsing fails. We don't want any silent server starts.
 					template.Must(tmpl.Funcs(helperFuncs).Parse(string(buf)))
 					break
->>>>>>> change Directory to Directies
 				}
 			}
 			return nil

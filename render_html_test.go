@@ -10,7 +10,8 @@ import (
 
 func TestHTMLBad(t *testing.T) {
 	render := New(Options{
-		Directory: "fixtures/basic",
+		Directories:   []string{"fixtures/basic"},
+		TrimExtension: true,
 	})
 
 	var err error
@@ -29,8 +30,9 @@ func TestHTMLBad(t *testing.T) {
 
 func TestHTMLBadDisableHTTPErrorRendering(t *testing.T) {
 	render := New(Options{
-		Directory:                 "fixtures/basic",
+		Directories:               []string{"fixtures/basic"},
 		DisableHTTPErrorRendering: true,
+		TrimExtension:             true,
 	})
 
 	var err error
@@ -49,7 +51,8 @@ func TestHTMLBadDisableHTTPErrorRendering(t *testing.T) {
 
 func TestHTMLBasic(t *testing.T) {
 	render := New(Options{
-		Directory: "fixtures/basic",
+		Directories:   []string{"fixtures/basic"},
+		TrimExtension: true,
 	})
 
 	var err error
@@ -69,8 +72,9 @@ func TestHTMLBasic(t *testing.T) {
 
 func TestHTMLXHTML(t *testing.T) {
 	render := New(Options{
-		Directory:       "fixtures/basic",
+		Directories:     []string{"fixtures/basic"},
 		HTMLContentType: ContentXHTML,
+		TrimExtension:   true,
 	})
 
 	var err error
@@ -90,8 +94,9 @@ func TestHTMLXHTML(t *testing.T) {
 
 func TestHTMLExtensions(t *testing.T) {
 	render := New(Options{
-		Directory:  "fixtures/basic",
-		Extensions: []string{".tmpl", ".html"},
+		Directories:   []string{"fixtures/basic"},
+		Extensions:    []string{".tmpl", ".html"},
+		TrimExtension: true,
 	})
 
 	var err error
@@ -111,7 +116,8 @@ func TestHTMLExtensions(t *testing.T) {
 
 func TestHTMLFuncs(t *testing.T) {
 	render := New(Options{
-		Directory: "fixtures/custom_funcs",
+		Directories:   []string{"fixtures/custom_funcs"},
+		TrimExtension: true,
 		Funcs: []template.FuncMap{
 			{
 				"myCustomFunc": func() string {
@@ -136,8 +142,9 @@ func TestHTMLFuncs(t *testing.T) {
 
 func TestRenderLayout(t *testing.T) {
 	render := New(Options{
-		Directory: "fixtures/basic",
-		Layout:    "layout",
+		Directories:   []string{"fixtures/basic"},
+		Layout:        "layout",
+		TrimExtension: true,
 	})
 
 	var err error
@@ -155,8 +162,9 @@ func TestRenderLayout(t *testing.T) {
 
 func TestHTMLLayoutCurrent(t *testing.T) {
 	render := New(Options{
-		Directory: "fixtures/basic",
-		Layout:    "current_layout",
+		Directories:   []string{"fixtures/basic"},
+		Layout:        "current_layout",
+		TrimExtension: true,
 	})
 
 	var err error
@@ -174,7 +182,8 @@ func TestHTMLLayoutCurrent(t *testing.T) {
 
 func TestHTMLNested(t *testing.T) {
 	render := New(Options{
-		Directory: "fixtures/basic",
+		Directories:   []string{"fixtures/basic"},
+		TrimExtension: true,
 	})
 
 	var err error
@@ -194,7 +203,8 @@ func TestHTMLNested(t *testing.T) {
 
 func TestHTMLBadPath(t *testing.T) {
 	render := New(Options{
-		Directory: "../../../../../../../../../../../../../../../../fixtures/basic",
+		Directories:   []string{"../../../../../../../../../../../../../../../../fixtures/basic"},
+		TrimExtension: true,
 	})
 
 	var err error
@@ -212,8 +222,9 @@ func TestHTMLBadPath(t *testing.T) {
 
 func TestHTMLDelimiters(t *testing.T) {
 	render := New(Options{
-		Delims:    Delims{"{[{", "}]}"},
-		Directory: "fixtures/basic",
+		Delims:        Delims{"{[{", "}]}"},
+		Directories:   []string{"fixtures/basic"},
+		TrimExtension: true,
 	})
 
 	var err error
@@ -233,7 +244,8 @@ func TestHTMLDelimiters(t *testing.T) {
 
 func TestHTMLDefaultCharset(t *testing.T) {
 	render := New(Options{
-		Directory: "fixtures/basic",
+		Directories:   []string{"fixtures/basic"},
+		TrimExtension: true,
 	})
 
 	var err error
@@ -256,8 +268,9 @@ func TestHTMLDefaultCharset(t *testing.T) {
 
 func TestHTMLOverrideLayout(t *testing.T) {
 	render := New(Options{
-		Directory: "fixtures/basic",
-		Layout:    "layout",
+		Directories:   []string{"fixtures/basic"},
+		Layout:        "layout",
+		TrimExtension: true,
 	})
 
 	var err error
@@ -280,7 +293,8 @@ func TestHTMLOverrideLayout(t *testing.T) {
 func TestHTMLNoRace(t *testing.T) {
 	// This test used to fail if run with -race
 	render := New(Options{
-		Directory: "fixtures/basic",
+		Directories:   []string{"fixtures/basic"},
+		TrimExtension: true,
 	})
 
 	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -311,6 +325,7 @@ func TestHTMLNoRace(t *testing.T) {
 
 func TestHTMLLoadFromAssets(t *testing.T) {
 	render := New(Options{
+		TrimExtension: true,
 		Asset: func(file string) ([]byte, error) {
 			switch file {
 			case "templates/test.tmpl":
@@ -351,8 +366,9 @@ func TestCompileTemplatesFromDir(t *testing.T) {
 	dirShouldNotParsedRel := "dedicated"
 
 	r := New(Options{
-		Directory:  baseDir,
-		Extensions: []string{".tmpl", ".html"},
+		Directories:   []string{baseDir},
+		Extensions:    []string{".tmpl", ".html"},
+		TrimExtension: true,
 	})
 	r.compileTemplatesFromDir()
 
@@ -364,8 +380,9 @@ func TestCompileTemplatesFromDir(t *testing.T) {
 
 func TestHTMLDisabledCharset(t *testing.T) {
 	render := New(Options{
-		Directory:      "fixtures/basic",
+		Directories:    []string{"fixtures/basic"},
 		DisableCharset: true,
+		TrimExtension:  true,
 	})
 
 	var err error

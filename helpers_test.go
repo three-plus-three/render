@@ -8,8 +8,9 @@ import (
 
 func TestRenderPartial(t *testing.T) {
 	render := New(Options{
-		Directory: "fixtures/partials",
-		Layout:    "layout",
+		Directories:   []string{"fixtures/partials"},
+		Layout:        "layout",
+		TrimExtension: true,
 	})
 
 	var renErr error
@@ -30,9 +31,10 @@ func TestRenderPartial(t *testing.T) {
 
 func TestRenderPartialRequirePartialsOff(t *testing.T) {
 	render := New(Options{
-		Directory:       "fixtures/partials",
+		Directories:     []string{"fixtures/partials"},
 		Layout:          "layout",
 		RequirePartials: false,
+		TrimExtension:   true,
 	})
 
 	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -51,9 +53,10 @@ func TestRenderPartialRequirePartialsOff(t *testing.T) {
 
 func TestRenderPartialRequirePartialsOn(t *testing.T) {
 	render := New(Options{
-		Directory:       "fixtures/partials",
+		Directories:     []string{"fixtures/partials"},
 		Layout:          "layout",
 		RequirePartials: true,
+		TrimExtension:   true,
 	})
 
 	h := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
