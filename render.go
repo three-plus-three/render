@@ -103,6 +103,8 @@ type Options struct {
 	// Enables using partials without the current filename suffix which allows use of the same template in multiple files. e.g {{ partial "carosuel" }} inside the home template will match carosel-home or carosel.
 	// ***NOTE*** - This option should be named RenderPartialsWithoutSuffix as that is what it does. "Prefix" is a typo. Maintaining the existing name for backwards compatibility.
 	RenderPartialsWithoutPrefix bool
+	// Don't trim file extension.
+	NoTrimExtension bool
 }
 
 // HTMLOptions is a struct for overriding some rendering Options for specific HTML call.
@@ -147,8 +149,8 @@ func (r *Render) prepareOptions() {
 		r.compiledCharset = "; charset=" + r.opt.Charset
 	}
 
-	if len(r.opt.Directory) == 0 {
-		r.opt.Directory = "templates"
+	if len(r.opt.Directories) == 0 {
+		r.opt.Directories = []string{"templates"}
 	}
 	if r.opt.FileSystem == nil {
 		r.opt.FileSystem = &LocalFileSystem{}
@@ -185,10 +187,11 @@ func (r *Render) compileTemplates() {
 }
 
 func (r *Render) compileTemplatesFromDir() {
-	dir := r.opt.Directory
-	r.templates = template.New(dir)
+	dirs := r.opt.Directories
+	r.templates = template.New(strings.Join(dirs, string(filepath.ListSeparator)))
 	r.templates.Delims(r.opt.Delims.Left, r.opt.Delims.Right)
 
+<<<<<<< HEAD
 	// Walk the supplied directory and compile any files that match our extension list.
 	r.opt.FileSystem.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		// Fix same-extension-dirs bug: some dir might be named to: "users.tmpl", "local.html".
@@ -198,54 +201,85 @@ func (r *Render) compileTemplatesFromDir() {
 		if info == nil || info.IsDir() {
 			return nil
 		}
+=======
+	for _, dir := range dirs {
+		// Walk the supplied directory and compile any files that match our extension list.
+		filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+			// Fix same-extension-dirs bug: some dir might be named to: "users.tmpl", "local.html".
+			// These dirs should be excluded as they are not valid golang templates, but files under
+			// them should be treat as normal.
+			// If is a dir, return immediately (dir is not a valid golang template).
+			if info == nil || info.IsDir() {
+				return nil
+			}
+>>>>>>> change Directory to Directies
 
-		rel, err := filepath.Rel(dir, path)
-		if err != nil {
-			return err
-		}
+			rel, err := filepath.Rel(dir, path)
+			if err != nil {
+				return err
+			}
 
-		ext := ""
-		if strings.Index(rel, ".") != -1 {
-			ext = filepath.Ext(rel)
-		}
+			ext := ""
+			if strings.Index(rel, ".") != -1 {
+				ext = filepath.Ext(rel)
+			}
 
+<<<<<<< HEAD
 		for _, extension := range r.opt.Extensions {
 			if ext == extension {
 				buf, err := r.opt.FileSystem.ReadFile(path)
 				if err != nil {
 					panic(err)
+=======
+			for _, extension := range r.opt.Extensions {
+				if ext == extension {
+					buf, err := ioutil.ReadFile(path)
+					if err != nil {
+						panic(err)
+					}
+
+					name := rel
+					if !r.opt.NoTrimExtension {
+						name = (rel[0 : len(rel)-len(ext)])
+					}
+					tmpl := r.templates.New(filepath.ToSlash(name))
+
+					// Add our funcmaps.
+					for _, funcs := range r.opt.Funcs {
+						tmpl.Funcs(funcs)
+					}
+
+					// Break out if this parsing fails. We don't want any silent server starts.
+					template.Must(tmpl.Funcs(helperFuncs).Parse(string(buf)))
+					break
+>>>>>>> change Directory to Directies
 				}
-
-				name := (rel[0 : len(rel)-len(ext)])
-				tmpl := r.templates.New(filepath.ToSlash(name))
-
-				// Add our funcmaps.
-				for _, funcs := range r.opt.Funcs {
-					tmpl.Funcs(funcs)
-				}
-
-				// Break out if this parsing fails. We don't want any silent server starts.
-				template.Must(tmpl.Funcs(helperFuncs).Parse(string(buf)))
-				break
 			}
-		}
-		return nil
-	})
+			return nil
+		})
+	}
 }
 
 func (r *Render) compileTemplatesFromAsset() {
-	dir := r.opt.Directory
-	r.templates = template.New(dir)
+	dirs := r.opt.Directories
+	r.templates = template.New(strings.Join(dirs, string(filepath.ListSeparator)))
 	r.templates.Delims(r.opt.Delims.Left, r.opt.Delims.Right)
 
 	for _, path := range r.opt.AssetNames() {
-		if !strings.HasPrefix(path, dir) {
-			continue
+		var rel string
+		for _, dir := range dirs {
+			if strings.HasPrefix(path, dir) {
+				relPath, err := filepath.Rel(dir, path)
+				if err != nil {
+					panic(err)
+				}
+				rel = relPath
+				break
+			}
 		}
 
-		rel, err := filepath.Rel(dir, path)
-		if err != nil {
-			panic(err)
+		if rel == "" {
+			continue
 		}
 
 		ext := ""
