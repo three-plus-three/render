@@ -104,7 +104,7 @@ type Options struct {
 	// ***NOTE*** - This option should be named RenderPartialsWithoutSuffix as that is what it does. "Prefix" is a typo. Maintaining the existing name for backwards compatibility.
 	RenderPartialsWithoutPrefix bool
 	// Don't trim file extension.
-	NoTrimExtension bool
+	TrimExtension bool
 }
 
 // HTMLOptions is a struct for overriding some rendering Options for specific HTML call.
@@ -239,7 +239,7 @@ func (r *Render) compileTemplatesFromDir() {
 					}
 
 					name := rel
-					if !r.opt.NoTrimExtension {
+					if r.opt.TrimExtension {
 						name = (rel[0 : len(rel)-len(ext)])
 					}
 					tmpl := r.templates.New(filepath.ToSlash(name))
