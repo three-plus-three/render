@@ -18,4 +18,19 @@ var helperFuncs = template.FuncMap{
 	"current": func() (string, error) {
 		return "", nil
 	},
+	"htmlattr": func(s string) template.HTMLAttr {
+		return template.HTMLAttr(s)
+	},
+	"html": func(s string) template.HTML {
+		return template.HTML(s)
+	},
+	"js": func(s string) template.JS {
+		return template.JS(s)
+	},
+	"set_src": func(s string) template.Srcset {
+		return template.Srcset(s)
+	},
+	"jsstr": func(s string) template.JSStr {
+		return template.JSStr(s)
+	},
 }
