@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -42,6 +43,12 @@ func BenchmarkStreamingJSON(b *testing.B) {
 
 /* Test Helper */
 func expect(t *testing.T, a interface{}, b interface{}) {
+	if sa, ok := a.(string); ok {
+		a = strings.ReplaceAll(sa, "\r\n", "\n")
+	}
+	if sb, ok := b.(string); ok {
+		b = strings.ReplaceAll(sb, "\r\n", "\n")
+	}
 	if a != b {
 		t.Errorf("Expected ||%#v|| (type %v) - Got ||%#v|| (type %v)", b, reflect.TypeOf(b), a, reflect.TypeOf(a))
 	}
