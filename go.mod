@@ -1,4 +1,4 @@
-module github.com/runner-mei/render
+module github.com/three-plus-three/render
 
 go 1.12
 
