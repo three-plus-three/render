@@ -111,6 +111,8 @@ type Options struct {
 type HTMLOptions struct {
 	// Layout template name. Overrides Options.Layout.
 	Layout string
+
+	ContentType string
 }
 
 // Render is a service that provides functions for easily writing JSON, XML,
@@ -397,6 +399,9 @@ func (r *Render) HTML(w io.Writer, status int, name string, binding interface{},
 	head := Head{
 		ContentType: r.opt.HTMLContentType + r.compiledCharset,
 		Status:      status,
+	}
+	if opt.ContentType != "" {
+		head.ContentType = opt.ContentType
 	}
 
 	h := HTML{
